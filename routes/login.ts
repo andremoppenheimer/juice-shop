@@ -33,7 +33,12 @@ module.exports = function login () {
 
   return (req: Request, res: Response, next: NextFunction) => {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
-    models.sequelize.query(`SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL`, {  email: req.body.email, password: security.hash(req.body.password), model: UserModel, plain: true }) // Implementing parametrized query, avoiding embedding user input directly in the code,making it safer to injection attacks
+    models.sequelize.query(`SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL`,
+                           {replacements: {email: req.body.email, password: security.hash(req.body.password)},
+                            model: UserModel,
+                            plain: true 
+                           }
+                          ) // Implementing parametrized query, avoiding embedding user input directly in the code,making it safer to injection attacks
       .then((authenticatedUser) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
