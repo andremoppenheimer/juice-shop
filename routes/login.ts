@@ -36,7 +36,8 @@ module.exports = function login () {
     models.sequelize.query(`SELECT * FROM Users WHERE email = :email AND password = :password AND deletedAt IS NULL`,
                            {replacements: {email: req.body.email, password: security.hash(req.body.password)},
                             model: UserModel,
-                            plain: true 
+                            plain: true,
+                            type: sequelize.QueryTypes.SELECT //
                            }
                           ) // Implementing parametrized query, avoiding embedding user input directly in the code,making it safer to injection attacks
       .then((authenticatedUser) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
